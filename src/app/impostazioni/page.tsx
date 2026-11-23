@@ -22,20 +22,20 @@ export default async function ImpostazioniPage({ searchParams }: { searchParams:
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card title="Stato del sistema">
-          <dl className="grid grid-cols-[8rem_1fr] gap-y-2 text-sm">
-            <dt className="text-slate-500">Database</dt>
+          <dl className="grid gap-y-3 text-sm sm:grid-cols-[8rem_1fr] sm:gap-y-2">
+            <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Database</dt>
             <dd>{dbMode() === "locale" ? "locale, cartella data/pglite" : "PostgreSQL (DATABASE_URL)"}</dd>
-            <dt className="text-slate-500">WhatsApp</dt>
+            <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">WhatsApp</dt>
             <dd>{env.whatsapp.enabled ? "Cloud API di Meta attiva" : "simulato (nessun invio reale)"}</dd>
-            <dt className="text-slate-500">Email</dt>
+            <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Email</dt>
             <dd>{env.smtp.enabled ? `SMTP ${env.smtp.host}` : "simulate (il PDF viene comunque archiviato)"}</dd>
             {tenant && settings ? (
               <>
-                <dt className="text-slate-500">Gestore</dt>
+                <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Gestore</dt>
                 <dd>
                   {tenant.managerName} · +{tenant.managerWhatsapp}
                 </dd>
-                <dt className="text-slate-500">Regole</dt>
+                <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Regole</dt>
                 <dd>
                   escalation dopo {settings.escalationHours} h · promemoria alle {settings.reminderTime} · attesa ospiti{" "}
                   {settings.guestsQuestionTimeoutHours} h · calendari ogni {settings.syncIntervalMinutes} min
@@ -59,7 +59,7 @@ export default async function ImpostazioniPage({ searchParams }: { searchParams:
             <button className="btn btn-primary">Importa configurazione</button>
           </form>
 
-          <div className="mt-6 border-t border-slate-200 pt-4">
+          <div className="mt-6 rounded-lg border border-red-200 bg-red-50/60 p-4">
             <p className="mb-2 text-sm text-slate-600">
               <strong>Dati demo:</strong> 8 appartamenti inventati con calendari finti in <code>data/demo-ical</code>.{" "}
               <span className="text-red-700">Cancella tutti i dati presenti.</span>

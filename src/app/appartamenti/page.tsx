@@ -65,12 +65,12 @@ export default async function AppartamentiPage({ searchParams }: { searchParams:
                 </span>
               }
             >
-              <dl className="grid grid-cols-[9rem_1fr] gap-x-3 gap-y-2 text-sm">
-                <dt className="text-slate-500">Orari</dt>
+              <dl className="grid gap-x-4 gap-y-3 text-sm sm:grid-cols-[9rem_1fr] sm:gap-y-2">
+                <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Orari</dt>
                 <dd>
                   check-out {apt.checkoutTime} · check-in {apt.checkinTime} · {apt.defaultLinenSets} set standard · max {apt.maxGuests} ospiti
                 </dd>
-                <dt className="text-slate-500">Calendari</dt>
+                <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Calendari</dt>
                 <dd className="space-y-1">
                   {feeds
                     .filter((f) => f.apartmentId === apt.id)
@@ -85,14 +85,14 @@ export default async function AppartamentiPage({ searchParams }: { searchParams:
                       </div>
                     ))}
                 </dd>
-                <dt className="text-slate-500">Proprietari</dt>
+                <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Proprietari</dt>
                 <dd>
                   {shares
                     .filter((s) => s.apartmentId === apt.id)
                     .map((s) => `${s.name} (${formatBps(s.shareBps)})`)
                     .join(", ")}
                 </dd>
-                <dt className="text-slate-500">Addette</dt>
+                <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Addette</dt>
                 <dd>
                   {team
                     .filter((t) => t.apartmentId === apt.id)
@@ -119,11 +119,11 @@ export default async function AppartamentiPage({ searchParams }: { searchParams:
                       );
                     })}
                 </dd>
-                <dt className="text-slate-500">Contratto</dt>
+                <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Contratto</dt>
                 <dd>
                   {contract ? describeContract(contract.params).slice(0, 1).concat(describeContract(contract.params).slice(2)).join(" · ") : "nessuno"}
                 </dd>
-                <dt className="text-slate-500">Rendiconti inviati</dt>
+                <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Rendiconti inviati</dt>
                 <dd className="flex flex-wrap gap-2">
                   {archive.length === 0 ? <span className="text-slate-400">nessuno</span> : null}
                   {archive.map((s) => (

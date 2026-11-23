@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { and, asc, eq, gte, inArray, isNull, lte } from "drizzle-orm";
+import { CalendarDays, ChevronLeft, ChevronRight, CircleCheck, Clock, Sparkles, UserRound, Users } from "lucide-react";
 import { getDb } from "@/db/client";
 import { apartments, cleaners, cleaningJobs, icalFeeds, reservations } from "@/db/schema";
 import { getTenant } from "@/services/common";
@@ -115,16 +116,16 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
       <Flash ok={param(sp, "ok")} errore={param(sp, "errore")} />
 
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <Stat label="Pulizie oggi" value={todayJobs.length} />
-        <Stat label="Prossimi 7 giorni" value={active.length} />
-        <Stat label="In attesa di risposta" value={waiting.length} tone={waiting.length ? "amber" : undefined} />
-        <Stat label="Da riassegnare" value={escalations.length} tone={escalations.length ? "red" : undefined} />
-        <Stat label="Prenotazioni senza ospiti" value={noGuests.length} tone={noGuests.length ? "amber" : undefined} />
+        <Stat label="Pulizie oggi" value={todayJobs.length} icon={Sparkles} />
+        <Stat label="Prossimi 7 giorni" value={active.length} icon={CalendarDays} />
+        <Stat label="In attesa di risposta" value={waiting.length} tone={waiting.length ? "amber" : undefined} icon={Clock} />
+        <Stat label="Da riassegnare" value={escalations.length} tone={escalations.length ? "red" : undefined} icon={UserRound} />
+        <Stat label="Prenotazioni senza ospiti" value={noGuests.length} tone={noGuests.length ? "amber" : undefined} icon={Users} />
       </div>
 
       <div className="mb-6 grid gap-6 xl:grid-cols-3">
         <Card title={`Da guardare (${alerts + noGuests.length})`} className="xl:col-span-1">
-          {alerts + noGuests.length === 0 ? <Empty>Tutto in ordine.</Empty> : null}
+          {alerts + noGuests.length === 0 ? <Empty icon={CircleCheck}>Tutto in ordine.</Empty> : null}
           <ul className="space-y-3 text-sm">
             {escalations.map(({ job, aptName, cleanerName }) => (
               <li key={job.id} className="flex items-start gap-2">
@@ -196,6 +197,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
         actions={
           <div className="flex gap-1">
             <Link className="btn btn-sm" href={`/?mese=${previousPeriod(period)}`}>
+              <ChevronLeft className="size-4" aria-hidden />
               Mese prima
             </Link>
             <Link className="btn btn-sm" href="/">
@@ -203,11 +205,12 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
             </Link>
             <Link className="btn btn-sm" href={`/?mese=${nextPeriod(period)}`}>
               Mese dopo
+              <ChevronRight className="size-4" aria-hidden />
             </Link>
           </div>
         }
       >
-        <div className="grid grid-cols-7 gap-px overflow-hidden rounded-md border border-slate-200 bg-slate-200 text-xs">
+        <div className="hidden overflow-hidden rounded-lg border border-slate-200 bg-slate-200 text-xs md:grid md:grid-cols-7 md:gap-px">
           {["lun", "mar", "mer", "gio", "ven", "sab", "dom"].map((d) => (
             <div key={d} className="bg-slate-50 px-2 py-1 font-semibold uppercase text-slate-500">
               {d}
@@ -235,6 +238,35 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
               ) : null}
             </div>
           ))}
+        </div>
+        <div className="space-y-4 md:hidden">
+          {days.some((d) => d && (byDate.get(d)?.length ?? 0) > 0) ? null : <Empty icon={CalendarDays}>Nessuna pulizia in questo mese.</Empty>}
+          {days
+            .filter((d): d is string => d !== null && (byDate.get(d)?.length ?? 0) > 0)
+            .map((d) => (
+              <div key={d}>
+                <div className={`mb-1.5 text-sm font-semibold ${d === today ? "text-brand" : "text-slate-700"}`}>
+                  {formatShort(d)}
+                  {d === today ? " · oggi" : ""}
+                </div>
+                <ul className="space-y-1.5">
+                  {(byDate.get(d) ?? []).map(({ job, aptName, cleanerName }) => (
+                    <li key={job.id}>
+                      <Link
+                        href={`/pulizie?dal=${d}&al=${d}`}
+                        className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium ${CHIP[job.status]}`}
+                      >
+                        <span className="min-w-0 truncate">
+                          {aptName}
+                          {job.sameDay ? " · CG" : ""}
+                        </span>
+                        <span className="shrink-0 text-xs font-normal opacity-80">{cleanerName ?? "senza addetta"}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
         </div>
         <p className="mt-3 text-xs text-slate-500">
           CG = cambio in giornata. Colori: grigio creato, giallo inviato, azzurro confermato, verde completato, rosso escalation.

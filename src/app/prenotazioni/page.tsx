@@ -1,4 +1,5 @@
 import { and, asc, eq, gte, lte } from "drizzle-orm";
+import { CalendarDays } from "lucide-react";
 import { getDb } from "@/db/client";
 import { apartments, reservations } from "@/db/schema";
 import { requireTenant } from "@/services/common";
@@ -39,149 +40,149 @@ export default async function PrenotazioniPage({ searchParams }: { searchParams:
 
   return (
     <div>
-      <PageHeader
-        title="Prenotazioni"
-        subtitle="Arrivano dai calendari iCal. Qui completi ospiti, importi e note."
-      />
+      <PageHeader title="Prenotazioni" subtitle="Arrivano dai calendari iCal. Qui completi ospiti, importi e note." />
       <Flash ok={param(sp, "ok")} errore={param(sp, "errore")} />
 
-      <form className="mb-5 flex flex-wrap items-end gap-3" method="get">
-        <label className="flex flex-col gap-1">
-          <span className="label">Dal</span>
-          <input className="input" type="date" name="dal" defaultValue={from} />
-        </label>
-        <label className="flex flex-col gap-1">
-          <span className="label">Al</span>
-          <input className="input" type="date" name="al" defaultValue={to} />
-        </label>
-        <label className="flex flex-col gap-1">
-          <span className="label">Appartamento</span>
-          <select className="input" name="appartamento" defaultValue={aptFilter}>
-            <option value="">Tutti</option>
-            {apts.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.code} · {a.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button className="btn">Filtra</button>
+      <form className="card mb-6 p-4" method="get">
+        <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:items-end">
+          <label className="flex flex-col gap-1.5">
+            <span className="label">Dal</span>
+            <input className="input" type="date" name="dal" defaultValue={from} />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="label">Al</span>
+            <input className="input" type="date" name="al" defaultValue={to} />
+          </label>
+          <label className="col-span-2 flex flex-col gap-1.5 md:col-span-1">
+            <span className="label">Appartamento</span>
+            <select className="input md:min-w-56" name="appartamento" defaultValue={aptFilter}>
+              <option value="">Tutti</option>
+              {apts.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.code} · {a.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="col-span-2 md:col-span-1">
+            <button className="btn btn-primary w-full md:w-auto">Mostra</button>
+          </div>
+        </div>
       </form>
 
-      <Card title={`${rows.length} prenotazioni`} className="mb-6">
-        {rows.length === 0 ? <Empty>Nessuna prenotazione nel periodo.</Empty> : null}
+      <Card title={`${rows.length} ${rows.length === 1 ? "prenotazione" : "prenotazioni"}`} className="mb-6">
+        {rows.length === 0 ? <Empty icon={CalendarDays}>Nessuna prenotazione nel periodo selezionato.</Empty> : null}
         {rows.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Appartamento</th>
-                  <th>Soggiorno</th>
-                  <th>Canale</th>
-                  <th>Ospiti</th>
-                  <th>Importi</th>
-                  <th>Stato</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map(({ r, apt }) => (
-                  <tr key={r.id} className={r.status === "cancellata" ? "opacity-60" : ""}>
-                    <td>
-                      <div className="font-medium">{apt.name}</div>
-                      <div className="text-xs text-slate-500">codice {r.ref}</div>
-                    </td>
-                    <td className="whitespace-nowrap">
+          <ul className="-mx-5 -my-5 divide-y divide-slate-100">
+            {rows.map(({ r, apt }) => (
+              <li key={r.id} className={`space-y-3 px-5 py-4 ${r.status === "cancellata" ? "opacity-60" : ""}`}>
+                <div className="grid gap-3 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,0.9fr)_auto] md:items-center md:gap-5">
+                  <div className="min-w-0">
+                    <div className="font-semibold text-slate-900">{apt.name}</div>
+                    <div className="text-xs text-slate-500">codice {r.ref}</div>
+                  </div>
+
+                  <div>
+                    <div className="text-sm font-medium tabular-nums text-slate-800">
                       {formatShort(r.checkin)} → {formatShort(r.checkout)}
-                      <div className="text-xs text-slate-500">
-                        {diffDays(r.checkin, r.checkout)} notti{r.arrivalTime ? ` · arrivo ${r.arrivalTime}` : ""}
-                      </div>
-                    </td>
-                    <td>
-                      {CHANNEL[r.channel] ?? r.channel}
-                      {r.externalCode ? <div className="text-xs text-slate-500">{r.externalCode}</div> : null}
-                    </td>
-                    <td>
-                      {r.status === "cancellata" ? (
-                        r.guests ?? "—"
-                      ) : (
-                        <form action={guestsAction} className="flex items-center gap-1">
-                          <Back to={here} />
-                          <input type="hidden" name="reservationId" value={r.id} />
-                          <input
-                            className={`input w-16 py-0.5 ${r.guests === null ? "border-amber-400 bg-amber-50" : ""}`}
-                            type="number"
-                            min={1}
-                            max={30}
-                            name="guests"
-                            defaultValue={r.guests ?? ""}
-                            aria-label="Numero di ospiti"
-                          />
-                          <button className="btn btn-sm">OK</button>
-                        </form>
-                      )}
-                    </td>
-                    <td className="min-w-56">
-                      <div className="text-xs tabular-nums text-slate-600">
-                        {r.grossCents !== null
-                          ? `lordo ${formatEuro(r.grossCents)} · comm. ${formatEuro(r.otaCommissionCents ?? 0)}`
-                          : r.status !== "cancellata"
-                            ? "importi da inserire"
-                            : "—"}
-                      </div>
-                      {r.status !== "cancellata" ? (
-                        <details>
-                          <summary className="cursor-pointer text-xs text-brand">Modifica importi e note</summary>
-                          <form action={reservationDetailsAction} className="mt-2 grid grid-cols-2 gap-2">
-                            <Back to={here} />
-                            <input type="hidden" name="reservationId" value={r.id} />
-                            <label className="flex flex-col gap-0.5">
-                              <span className="label">Lordo (€)</span>
-                              <input className="input py-0.5" name="gross" defaultValue={euroInput(r.grossCents)} />
-                            </label>
-                            <label className="flex flex-col gap-0.5">
-                              <span className="label">Commissione portale (€)</span>
-                              <input className="input py-0.5" name="ota" defaultValue={euroInput(r.otaCommissionCents)} />
-                            </label>
-                            <label className="flex flex-col gap-0.5">
-                              <span className="label">di cui quota pulizie (€)</span>
-                              <input className="input py-0.5" name="cleaningFee" defaultValue={euroInput(r.guestCleaningFeeCents)} />
-                            </label>
-                            <label className="flex flex-col gap-0.5">
-                              <span className="label">Tassa di soggiorno (€)</span>
-                              <input className="input py-0.5" name="touristTax" defaultValue={euroInput(r.touristTaxCents)} />
-                            </label>
-                            <label className="flex flex-col gap-0.5">
-                              <span className="label">Orario di arrivo</span>
-                              <input className="input py-0.5" name="arrivalTime" placeholder="es. 17:30" defaultValue={r.arrivalTime ?? ""} />
-                            </label>
-                            <label className="col-span-2 flex flex-col gap-0.5">
-                              <span className="label">Note</span>
-                              <input className="input py-0.5" name="notes" defaultValue={r.notes ?? ""} />
-                            </label>
-                            <div className="col-span-2">
-                              <button className="btn btn-sm btn-primary">Salva</button>
-                            </div>
-                          </form>
-                        </details>
-                      ) : null}
-                    </td>
-                    <td>
-                      <Pill tone={STATUS_TONE[r.status]}>{r.status.replace("_", " ")}</Pill>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {diffDays(r.checkin, r.checkout)} notti{r.arrivalTime ? ` · arrivo ${r.arrivalTime}` : ""}
+                    </div>
+                  </div>
+
+                  <div className="text-sm">
+                    {CHANNEL[r.channel] ?? r.channel}
+                    {r.externalCode ? <div className="text-xs text-slate-500">{r.externalCode}</div> : null}
+                  </div>
+
+                  <div className="text-sm">
+                    {r.status === "cancellata" ? (
+                      <span className="tabular-nums">{r.guests ?? "—"} ospiti</span>
+                    ) : (
+                      <form action={guestsAction} className="flex items-center gap-1.5">
+                        <Back to={here} />
+                        <input type="hidden" name="reservationId" value={r.id} />
+                        <label className="sr-only" htmlFor={`ospiti-${r.id}`}>
+                          Numero di ospiti
+                        </label>
+                        <input
+                          id={`ospiti-${r.id}`}
+                          className={`input min-h-9 w-20 py-1 text-sm ${r.guests === null ? "border-amber-400 bg-amber-50" : ""}`}
+                          type="number"
+                          min={1}
+                          max={30}
+                          name="guests"
+                          placeholder="ospiti"
+                          defaultValue={r.guests ?? ""}
+                        />
+                        <button className="btn btn-sm">OK</button>
+                      </form>
+                    )}
+                  </div>
+
+                  <div>
+                    <Pill tone={STATUS_TONE[r.status]}>{r.status.replace("_", " ")}</Pill>
+                  </div>
+                </div>
+
+                {r.status !== "cancellata" ? (
+                  <div className="flex flex-col gap-2 text-sm">
+                    <div className="text-xs tabular-nums text-slate-600">
+                      {r.grossCents !== null
+                        ? `lordo ${formatEuro(r.grossCents)} · commissione ${formatEuro(r.otaCommissionCents ?? 0)}`
+                        : "importi da inserire"}
+                    </div>
+                    <details className="max-w-2xl">
+                      <summary className="inline-flex cursor-pointer items-center rounded text-xs font-medium text-brand hover:underline">
+                        Modifica importi e note
+                      </summary>
+                      <form action={reservationDetailsAction} className="mt-3 grid grid-cols-1 gap-3 rounded-lg bg-slate-50 p-4 sm:grid-cols-2">
+                        <Back to={here} />
+                        <input type="hidden" name="reservationId" value={r.id} />
+                        <label className="flex flex-col gap-1">
+                          <span className="label">Lordo (€)</span>
+                          <input className="input" name="gross" defaultValue={euroInput(r.grossCents)} />
+                        </label>
+                        <label className="flex flex-col gap-1">
+                          <span className="label">Commissione portale (€)</span>
+                          <input className="input" name="ota" defaultValue={euroInput(r.otaCommissionCents)} />
+                        </label>
+                        <label className="flex flex-col gap-1">
+                          <span className="label">di cui quota pulizie (€)</span>
+                          <input className="input" name="cleaningFee" defaultValue={euroInput(r.guestCleaningFeeCents)} />
+                        </label>
+                        <label className="flex flex-col gap-1">
+                          <span className="label">Tassa di soggiorno (€)</span>
+                          <input className="input" name="touristTax" defaultValue={euroInput(r.touristTaxCents)} />
+                        </label>
+                        <label className="flex flex-col gap-1">
+                          <span className="label">Orario di arrivo</span>
+                          <input className="input" name="arrivalTime" placeholder="es. 17:30" defaultValue={r.arrivalTime ?? ""} />
+                        </label>
+                        <label className="flex flex-col gap-1">
+                          <span className="label">Note</span>
+                          <input className="input" name="notes" defaultValue={r.notes ?? ""} />
+                        </label>
+                        <div className="sm:col-span-2">
+                          <button className="btn btn-sm btn-primary">Salva</button>
+                        </div>
+                      </form>
+                    </details>
+                  </div>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         ) : null}
       </Card>
 
       <Card title="Aggiungi una prenotazione diretta">
-        <form action={manualReservationAction} className="flex flex-wrap items-end gap-3">
+        <form action={manualReservationAction} className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:flex md:flex-wrap md:items-end">
           <Back to={here} />
-          <label className="flex flex-col gap-1">
+          <label className="flex flex-col gap-1.5 sm:col-span-2 md:col-span-1">
             <span className="label">Appartamento</span>
-            <select className="input" name="apartmentId" defaultValue="" required>
+            <select className="input md:min-w-52" name="apartmentId" defaultValue="" required>
               <option value="" disabled>
                 Scegli…
               </option>
@@ -192,25 +193,27 @@ export default async function PrenotazioniPage({ searchParams }: { searchParams:
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-1">
+          <label className="flex flex-col gap-1.5">
             <span className="label">Check-in</span>
             <input className="input" type="date" name="checkin" required />
           </label>
-          <label className="flex flex-col gap-1">
+          <label className="flex flex-col gap-1.5">
             <span className="label">Check-out</span>
             <input className="input" type="date" name="checkout" required />
           </label>
-          <label className="flex flex-col gap-1">
+          <label className="flex flex-col gap-1.5">
             <span className="label">Ospiti</span>
-            <input className="input w-20" type="number" min={1} name="guests" required />
+            <input className="input md:w-24" type="number" min={1} name="guests" required />
           </label>
-          <label className="flex flex-col gap-1">
+          <label className="flex flex-col gap-1.5 sm:col-span-2 md:col-span-1 md:flex-1">
             <span className="label">Note</span>
             <input className="input" name="notes" />
           </label>
-          <button className="btn btn-primary">Aggiungi</button>
+          <div className="sm:col-span-2">
+            <button className="btn btn-primary w-full md:w-auto">Aggiungi prenotazione</button>
+          </div>
         </form>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-4 text-xs text-slate-500">
           Per prenotazioni fuori dai portali. La pulizia viene creata e inviata all&apos;addetta come le altre.
         </p>
       </Card>

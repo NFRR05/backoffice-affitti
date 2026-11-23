@@ -6,7 +6,7 @@ import { apartments, expenses, statements } from "@/db/schema";
 import { formatDate, formatPeriod, periodBounds } from "@/lib/dates";
 import { formatBps, formatEuro } from "@/lib/money";
 import { describeContract } from "@/domain/statement";
-import { Back, Card, Flash, PageHeader, Pill, param, type SearchParams } from "@/components/ui";
+import { Back, Card, Flash, PageHeader, Pill, StatementSteps, param, type SearchParams } from "@/components/ui";
 import { deleteExpenseAction, draftAction, expenseAction, statementAction } from "@/app/actions";
 
 const STATUS_TONE = { bozza: "amber", verificato: "brand", inviato: "green" } as const;
@@ -56,6 +56,8 @@ export default async function RendicontoPage({ params, searchParams }: { params:
         }
       />
       <Flash ok={param(sp, "ok")} errore={param(sp, "errore")} />
+
+      <StatementSteps status={st.status} />
 
       {st.correctionNote ? (
         <div className="mb-5 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm">Motivo della rettifica: {st.correctionNote}</div>

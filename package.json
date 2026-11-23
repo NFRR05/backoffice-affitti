@@ -21,6 +21,7 @@
     "@electric-sql/pglite": "0.5.17",
     "@react-pdf/renderer": "4.9.0",
     "drizzle-orm": "0.45.4",
+    "lucide-react": "1.70.0",
     "next": "16.4.6",
     "nodemailer": "10.6.1",
     "postgres": "3.4.9",
