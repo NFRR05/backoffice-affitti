@@ -1,10 +1,36 @@
 @import "tailwindcss";
 
+/*
+  Sistema visivo
+  - Serif (Instrument Serif) solo per titoli di pagina e numeri chiave.
+  - Sans (Instrument Sans) per tutto il resto, con cifre tabulari negli importi.
+  - Colori: carta, superfici bianche, inchiostro. Verde, arancio e rosso solo per gli stati.
+*/
 @theme {
-  --color-brand: #1f4e79;
-  --color-brand-strong: #173b5c;
-  --color-brand-soft: #e8f0f8;
-  --font-sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+
+  --color-paper: #f6f5f1;
+  --color-surface: #ffffff;
+  --color-hover: #efede7;
+  --color-line: #e5e2da;
+  --color-line-strong: #cfcac0;
+
+  --color-ink: #1b1a17;
+  --color-ink-soft: #3d3b36;
+  --color-muted: #6b675f;
+  --color-faint: #9b978e;
+
+  /* Barre dei soggiorni nel calendario di occupazione */
+  --color-stay: #ece9e1;
+  --color-stay-hover: #e2ded4;
+
+  --color-ok: #2e6b4f;
+  --color-ok-soft: #e9f2ec;
+  --color-warn: #8f5a0b;
+  --color-warn-soft: #fbf2e1;
+  --color-bad: #b4261a;
+  --color-bad-soft: #fcecea;
 }
 
 html {
@@ -13,53 +39,61 @@ html {
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-paper font-sans text-ink antialiased;
 }
 
 @layer base {
   :focus-visible {
-    outline: 2px solid var(--color-brand);
+    outline: 2px solid var(--color-ink);
     outline-offset: 2px;
+  }
+
+  summary {
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
   }
 }
 
-/* Componenti in un layer dedicato: le classi di utilità (w-16, py-1, …) li possono correggere caso per caso. */
+/* Componenti in un layer dedicato: le classi di utilità (w-24, h-9, …) li possono correggere caso per caso. */
 @layer components {
   .skip-link {
-    @apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg;
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2 focus:text-sm focus:font-medium;
   }
 
-  /* Bottoni: area di tocco di almeno 40px su telefono, 36px su desktop. */
+  /* Bottoni: 40px di altezza su telefono, 36px su desktop. Hover solo come cambio di colore. */
   .btn {
-    @apply inline-flex min-h-10 cursor-pointer select-none items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 shadow-xs transition-colors duration-150 hover:border-slate-400 hover:bg-slate-50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 md:min-h-9 md:px-3.5 md:py-1.5;
+    @apply inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-line-strong bg-surface px-4 text-sm font-medium whitespace-nowrap text-ink transition-colors duration-150 hover:bg-hover disabled:pointer-events-none disabled:opacity-50 md:h-9 md:px-3.5;
   }
 
   .btn-primary {
-    @apply border-brand bg-brand text-white shadow-sm hover:border-brand-strong hover:bg-brand-strong;
-  }
-
-  .btn-ghost {
-    @apply border-transparent bg-transparent text-slate-600 shadow-none hover:bg-slate-100 hover:text-slate-900;
+    @apply border-ink bg-ink text-white hover:border-ink-soft hover:bg-ink-soft;
   }
 
   .btn-danger {
-    @apply border-red-300 text-red-700 hover:border-red-400 hover:bg-red-50;
+    @apply border-bad/40 text-bad hover:bg-bad-soft;
   }
 
   .btn-sm {
-    @apply min-h-9 px-3 py-1.5 text-xs md:min-h-8 md:px-2.5 md:py-1;
+    @apply h-9 px-3 text-[13px] md:h-8;
+  }
+
+  .link {
+    @apply font-medium text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-ink;
   }
 
   .input {
-    @apply block min-h-10 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base text-slate-900 shadow-xs transition-colors duration-150 placeholder:text-slate-400 hover:border-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none disabled:bg-slate-100 md:min-h-9 md:py-1.5 md:text-sm;
+    @apply h-10 rounded-lg border border-line-strong bg-surface px-3 text-base text-ink transition-colors placeholder:text-faint focus:border-ink focus:ring-2 focus:ring-ink/10 focus:outline-none disabled:bg-paper md:h-9 md:text-sm;
   }
 
   .label {
-    @apply text-xs font-medium text-slate-600;
+    @apply text-[13px] font-medium text-ink-soft;
   }
 
   .card {
-    @apply rounded-xl border border-slate-200/80 bg-white shadow-xs;
+    @apply rounded-xl border border-line bg-surface;
   }
 
   .table {
@@ -67,11 +101,11 @@ body {
   }
 
   .table th {
-    @apply border-b border-slate-200 bg-slate-50/80 px-3 py-2.5 text-xs font-semibold tracking-wide text-slate-500 uppercase;
+    @apply border-b border-line px-3 py-2.5 text-[13px] font-medium text-muted;
   }
 
   .table td {
-    @apply border-b border-slate-100 px-3 py-3 align-top;
+    @apply border-b border-line/70 px-3 py-2.5 align-top;
   }
 
   .table tr:last-child td {

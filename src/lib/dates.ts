@@ -127,3 +127,11 @@ export function timeGte(a: string, b: string): boolean {
 export function hoursBetween(from: Date, to: Date): number {
   return (to.getTime() - from.getTime()) / 3_600_000;
 }
+
+const WEEKDAYS_LONG_IT = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"];
+
+/** "lunedì 23 novembre" */
+export function formatLong(iso: IsoDate): string {
+  const [, m, d] = iso.split("-").map(Number);
+  return `${WEEKDAYS_LONG_IT[weekday(iso)]} ${d} ${MONTHS_IT[m - 1]}`;
+}

@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { Building2, CalendarDays, LayoutDashboard, MessageCircle, Receipt, Settings, Sparkles, type LucideIcon } from "lucide-react";
+import { Building2, CalendarDays, House, MessageCircle, Receipt, Settings, Sparkles, type LucideIcon } from "lucide-react";
 
 const ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/", label: "Oggi", icon: House },
   { href: "/pulizie", label: "Pulizie", icon: Sparkles },
   { href: "/prenotazioni", label: "Prenotazioni", icon: CalendarDays },
   { href: "/messaggi", label: "Messaggi", icon: MessageCircle },
@@ -19,39 +19,58 @@ function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** Navigazione: verticale in colonna laterale (desktop), a pillole scorrevoli in alto (telefono). */
+/** Desktop: colonna con icone. Telefono: schede di solo testo scorrevoli, con la pagina corrente sottolineata. */
 export function AppNav({ variant }: { variant: "side" | "top" }) {
   const pathname = usePathname();
   const navRef = useRef<HTMLElement>(null);
   const side = variant === "side";
 
-  // Sulla barra scorrevole porta la pagina attiva al centro, così si vede sempre dove sei.
+  // Sulle schede scorrevoli porta in vista la pagina corrente.
   useEffect(() => {
     const nav = navRef.current;
     if (side || !nav) return;
     const active = nav.querySelector<HTMLElement>('[aria-current="page"]');
-    if (!active) return;
-    nav.scrollLeft = active.offsetLeft - nav.clientWidth / 2 + active.offsetWidth / 2;
+    if (active) nav.scrollLeft = active.offsetLeft - nav.clientWidth / 2 + active.offsetWidth / 2;
   }, [pathname, side]);
 
+  if (side) {
+    return (
+      <nav aria-label="Principale" className="flex flex-col gap-0.5 px-3">
+        {ITEMS.map(({ href, label, icon: Icon }) => {
+          const active = isActive(pathname, href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-current={active ? "page" : undefined}
+              className={`flex h-9 items-center gap-3 rounded-lg border px-3 text-sm transition-colors ${
+                active
+                  ? "border-line bg-surface font-medium text-ink"
+                  : "border-transparent text-ink-soft hover:bg-hover hover:text-ink"
+              }`}
+            >
+              <Icon className={`size-[18px] shrink-0 ${active ? "text-ink" : "text-muted"}`} strokeWidth={1.75} aria-hidden />
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
+    );
+  }
+
   return (
-    <nav
-      ref={navRef}
-      aria-label="Principale"
-      className={side ? "flex flex-col gap-0.5 px-3" : "scrollbar-none relative flex gap-1.5 overflow-x-auto px-4 pb-3"}
-    >
-      {ITEMS.map(({ href, label, icon: Icon }) => {
+    <nav ref={navRef} aria-label="Principale" className="scrollbar-none relative flex gap-5 overflow-x-auto px-4">
+      {ITEMS.map(({ href, label }) => {
         const active = isActive(pathname, href);
-        const className = side
-          ? `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              active ? "bg-brand-soft text-brand" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-            }`
-          : `inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
-              active ? "bg-brand text-white shadow-sm" : "bg-white text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-50"
-            }`;
         return (
-          <Link key={href} href={href} aria-current={active ? "page" : undefined} className={className}>
-            <Icon className="size-4 shrink-0" aria-hidden />
+          <Link
+            key={href}
+            href={href}
+            aria-current={active ? "page" : undefined}
+            className={`shrink-0 border-b-2 pt-1 pb-2.5 text-sm whitespace-nowrap transition-colors ${
+              active ? "border-ink font-medium text-ink" : "border-transparent text-muted hover:text-ink"
+            }`}
+          >
             {label}
           </Link>
         );

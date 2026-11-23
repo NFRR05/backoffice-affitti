@@ -1,10 +1,20 @@
 import { desc, eq } from "drizzle-orm";
+import type { ReactNode } from "react";
 import { dbMode, getDb } from "@/db/client";
 import { activityLog } from "@/db/schema";
 import { getTenant, settingsOf } from "@/services/common";
 import { env } from "@/lib/env";
-import { Back, Card, Flash, PageHeader, param, type SearchParams } from "@/components/ui";
+import { Back, Flash, PageHeader, Section, param, type SearchParams } from "@/components/ui";
 import { importConfigAction, loadDemoAction, syncNowAction } from "@/app/actions";
+
+function Row({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <>
+      <dt className="text-[13px] font-medium text-ink-soft sm:pt-px">{label}</dt>
+      <dd className="mb-4 text-sm text-ink sm:mb-0">{children}</dd>
+    </>
+  );
+}
 
 export default async function ImpostazioniPage({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams;
@@ -17,79 +27,89 @@ export default async function ImpostazioniPage({ searchParams }: { searchParams:
 
   return (
     <div className="max-w-4xl">
-      <PageHeader title="Impostazioni" />
+      <PageHeader title="Impostazioni" description="Stato dei servizi, configurazione e dati di prova." />
       <Flash ok={param(sp, "ok")} errore={param(sp, "errore")} />
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card title="Stato del sistema">
-          <dl className="grid gap-y-3 text-sm sm:grid-cols-[8rem_1fr] sm:gap-y-2">
-            <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Database</dt>
-            <dd>{dbMode() === "locale" ? "locale, cartella data/pglite" : "PostgreSQL (DATABASE_URL)"}</dd>
-            <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">WhatsApp</dt>
-            <dd>{env.whatsapp.enabled ? "Cloud API di Meta attiva" : "simulato (nessun invio reale)"}</dd>
-            <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Email</dt>
-            <dd>{env.smtp.enabled ? `SMTP ${env.smtp.host}` : "simulate (il PDF viene comunque archiviato)"}</dd>
+      <div className="space-y-6">
+        <Section
+          title="Stato del sistema"
+          actions={
+            <form action={syncNowAction}>
+              <Back to="/impostazioni" />
+              <button className="btn btn-sm">Sincronizza i calendari</button>
+            </form>
+          }
+        >
+          <dl className="grid gap-x-6 gap-y-1 sm:grid-cols-[9rem_1fr] sm:gap-y-4">
+            <Row label="Database">{dbMode() === "locale" ? "Locale, nella cartella data/pglite" : "PostgreSQL (DATABASE_URL)"}</Row>
+            <Row label="WhatsApp">{env.whatsapp.enabled ? "Attivo con la Cloud API di Meta" : "Simulato, nessun messaggio parte davvero"}</Row>
+            <Row label="Email">{env.smtp.enabled ? `SMTP su ${env.smtp.host}` : "Simulata, il PDF viene comunque archiviato"}</Row>
             {tenant && settings ? (
               <>
-                <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Gestore</dt>
-                <dd>
-                  {tenant.managerName} · +{tenant.managerWhatsapp}
-                </dd>
-                <dt className="text-xs font-medium tracking-wide text-slate-500 uppercase sm:text-sm sm:font-normal sm:tracking-normal sm:normal-case">Regole</dt>
-                <dd>
-                  escalation dopo {settings.escalationHours} h · promemoria alle {settings.reminderTime} · attesa ospiti{" "}
-                  {settings.guestsQuestionTimeoutHours} h · calendari ogni {settings.syncIntervalMinutes} min
-                </dd>
+                <Row label="Gestore">
+                  {tenant.managerName}, +{tenant.managerWhatsapp}
+                </Row>
+                <Row label="Regole">
+                  <ul className="space-y-1">
+                    <li>Riassegnazione dopo {settings.escalationHours} ore senza risposta</li>
+                    <li>Promemoria alle {settings.reminderTime} del giorno prima</li>
+                    <li>Attesa della risposta sugli ospiti: {settings.guestsQuestionTimeoutHours} ore</li>
+                    <li>Calendari letti ogni {settings.syncIntervalMinutes} minuti</li>
+                  </ul>
+                </Row>
               </>
             ) : null}
           </dl>
-          <form action={syncNowAction} className="mt-4">
-            <Back to="/impostazioni" />
-            <button className="btn">Sincronizza ora</button>
-          </form>
-        </Card>
+        </Section>
 
-        <Card title="Configurazione">
-          <p className="mb-3 text-sm text-slate-600">
-            Legge <code>config/configurazione.json</code> (parti da <code>configurazione.example.json</code>) e aggiorna appartamenti,
-            calendari, proprietari, addette, listini e contratti. Prenotazioni e pulizie restano.
+        <Section title="Configurazione" description="Aggiorna appartamenti, calendari, proprietari, addette, listini e contratti. Prenotazioni e pulizie restano.">
+          <p className="text-sm leading-6 text-muted">
+            Legge il file <code className="text-ink">config/configurazione.json</code>. Per crearlo parti da{" "}
+            <code className="text-ink">configurazione.example.json</code>.
           </p>
-          <form action={importConfigAction}>
+          <form action={importConfigAction} className="mt-5">
             <Back to="/impostazioni" />
-            <button className="btn btn-primary">Importa configurazione</button>
+            <button className="btn btn-primary">Importa la configurazione</button>
           </form>
+        </Section>
 
-          <div className="mt-6 rounded-lg border border-red-200 bg-red-50/60 p-4">
-            <p className="mb-2 text-sm text-slate-600">
-              <strong>Dati demo:</strong> 8 appartamenti inventati con calendari finti in <code>data/demo-ical</code>.{" "}
-              <span className="text-red-700">Cancella tutti i dati presenti.</span>
-            </p>
-            <form action={loadDemoAction} className="flex flex-wrap items-center gap-3">
-              <Back to="/" />
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="conferma" value="si" /> Ho capito, cancella tutto
-              </label>
-              <button className="btn btn-danger">Carica dati demo</button>
-            </form>
-          </div>
-        </Card>
+        <Section title="Dati demo" description="Otto appartamenti inventati, con calendari finti nella cartella data/demo-ical.">
+          <p className="text-sm font-medium text-bad">Caricare la demo cancella tutti i dati presenti.</p>
+          <form action={loadDemoAction} className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <Back to="/" />
+            <label className="flex items-center gap-2.5 text-sm text-ink">
+              <input type="checkbox" name="conferma" value="si" className="size-4 accent-ink" />
+              Ho capito, cancella tutto
+            </label>
+            <button className="btn btn-danger">Carica i dati demo</button>
+          </form>
+        </Section>
+
+        {log.length > 0 ? (
+          <Section title="Attività recenti" description="Le ultime 25 operazioni." flush>
+            <ul className="divide-y divide-line">
+              {log.map((l) => {
+                const action = l.action.replaceAll("_", " ");
+                return (
+                  <li key={l.id} className="grid gap-0.5 px-5 py-3 text-sm sm:grid-cols-[7.5rem_7rem_1fr] sm:gap-4">
+                    <span className="text-muted tabular-nums">
+                      {l.createdAt.toLocaleString("it-IT", {
+                        timeZone: "Europe/Rome",
+                        day: "2-digit",
+                        month: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                    <span className="text-muted">{l.actor.startsWith("whatsapp:") ? "WhatsApp" : l.actor}</span>
+                    <span className="text-ink">{action.charAt(0).toUpperCase() + action.slice(1)}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </Section>
+        ) : null}
       </div>
-
-      {log.length > 0 ? (
-        <Card title="Attività recenti" className="mt-6">
-          <ul className="divide-y divide-slate-100 text-sm">
-            {log.map((l) => (
-              <li key={l.id} className="flex flex-wrap gap-x-3 py-1.5">
-                <span className="w-32 text-slate-500 tabular-nums">
-                  {l.createdAt.toLocaleString("it-IT", { timeZone: "Europe/Rome", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
-                </span>
-                <span className="w-24 text-slate-500">{l.actor.startsWith("whatsapp:") ? "WhatsApp" : l.actor}</span>
-                <span>{l.action.replaceAll("_", " ")}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      ) : null}
     </div>
   );
 }
