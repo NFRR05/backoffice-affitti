@@ -1,0 +1,106 @@
+{
+  "gestore": {
+    "nome": "Nome Cognome",
+    "attivita": "Nome della tua attività",
+    "whatsapp": "+39 333 1234567",
+    "email": "tu@tuodominio.it",
+    "partitaIva": "01234567890",
+    "indirizzo": "Via Roma 1, 20100 Milano",
+    "colore": "#1F4E79"
+  },
+  "impostazioni": {
+    "oreEscalation": 12,
+    "orarioPromemoria": "18:00",
+    "oreAttesaOspiti": 24,
+    "minutiSincronizzazione": 15,
+    "festeLocali": ["12-07"]
+  },
+  "addette": [
+    { "nome": "Anna Bianchi", "tipo": "persona", "whatsapp": "+39 333 1111111" },
+    { "nome": "Pulizie Esempio srl", "tipo": "agenzia", "whatsapp": "+39 333 2222222", "email": "ordini@esempio.it" }
+  ],
+  "proprietari": [
+    { "nome": "Mario Rossi", "email": "mario.rossi@email.it", "codiceFiscale": "RSSMRA70A01F205X" },
+    { "nome": "Giulia Verdi", "email": "giulia.verdi@email.it" },
+    { "nome": "Luca Verdi", "email": "luca.verdi@email.it" }
+  ],
+  "appartamenti": [
+    {
+      "codice": "APP1",
+      "nome": "Trilocale Centro",
+      "indirizzo": "Via Esempio 10, Milano",
+      "checkIn": "15:00",
+      "checkOut": "10:00",
+      "setBiancheriaStandard": 2,
+      "ospitiMax": 4,
+      "noteAddette": "Chiavi nella cassetta, codice 1234",
+      "calendari": [
+        { "canale": "airbnb", "url": "https://www.airbnb.it/calendar/ical/INCOLLA-QUI-IL-LINK-DI-ESPORTAZIONE.ics" },
+        { "canale": "booking", "url": "https://ical.booking.com/v1/export?t=INCOLLA-QUI-IL-TOKEN" }
+      ],
+      "proprietari": [{ "email": "mario.rossi@email.it", "quota": 100 }],
+      "addette": [
+        { "whatsapp": "+39 333 1111111", "ruolo": "principale" },
+        { "whatsapp": "+39 333 2222222", "ruolo": "riserva" }
+      ],
+      "listini": [
+        {
+          "addetta": "+39 333 1111111",
+          "validoDal": "2026-01-01",
+          "base": 45,
+          "ospitiInclusi": 2,
+          "supplementoOspite": 5,
+          "setBiancheria": 8,
+          "festivi": { "tipo": "percentuale", "valore": 20, "domeniche": false }
+        },
+        {
+          "addetta": "+39 333 2222222",
+          "validoDal": "2026-01-01",
+          "base": 50,
+          "ospitiInclusi": 2,
+          "supplementoOspite": 5,
+          "setBiancheria": 9,
+          "festivi": { "tipo": "fissa", "valore": 10, "domeniche": true }
+        }
+      ],
+      "contratti": [
+        {
+          "validoDal": "2026-01-01",
+          "attribuzione": "checkin",
+          "baseCommissione": "netto_ota",
+          "tipoCommissione": "percentuale",
+          "percentuale": 20,
+          "pulizieACarico": "proprietario",
+          "quotaPulizieOspite": "ricavo_proprietario",
+          "iva": 22,
+          "ritenuta": { "attiva": false, "percentuale": 21, "base": "lordo" }
+        }
+      ]
+    },
+    {
+      "codice": "APP2",
+      "nome": "Bilocale Navigli",
+      "checkIn": "16:00",
+      "checkOut": "10:30",
+      "setBiancheriaStandard": 2,
+      "ospitiMax": 3,
+      "calendari": [{ "canale": "airbnb", "url": "https://www.airbnb.it/calendar/ical/ALTRO-LINK.ics" }],
+      "proprietari": [
+        { "email": "giulia.verdi@email.it", "quota": 50 },
+        { "email": "luca.verdi@email.it", "quota": 50 }
+      ],
+      "addette": [{ "whatsapp": "+39 333 2222222", "ruolo": "principale" }],
+      "listini": [{ "addetta": "+39 333 2222222", "validoDal": "2026-01-01", "base": 40, "setBiancheria": 8 }],
+      "contratti": [
+        {
+          "validoDal": "2026-01-01",
+          "tipoCommissione": "percentuale_con_minimo",
+          "percentuale": 18,
+          "minimo": 150,
+          "quotaPulizieOspite": "rimborso_gestore",
+          "pulizieACarico": "gestore"
+        }
+      ]
+    }
+  ]
+}
