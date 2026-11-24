@@ -1,4 +1,8 @@
-# Back-office affitti — versione 1
+<img src="public/brand/pronta-logo.svg" alt="Pronta" height="40">
+
+# Pronta — versione 1
+
+**Ogni casa pronta, ogni proprietario informato.**
 
 Web app per uso interno che gestisce **pulizie** e **rendiconti mensili ai proprietari** per 8–10 appartamenti in affitto breve, senza channel manager.
 
@@ -141,6 +145,7 @@ src/
   db/          schema del database (tutte le tabelle hanno tenant_id) e connessione
   app/         pagine (Dashboard, Pulizie, Prenotazioni, Messaggi, Rendiconti, Appartamenti, Impostazioni)
                e API (/api/cron/tick, /api/whatsapp/webhook)
+public/brand/  logo, icona e immagini del marchio Pronta
 config/        configurazione.example.json, logo.png facoltativo per i PDF
 drizzle/       migrazioni SQL
 data/          database locale, calendari demo, PDF archiviati (escluso da Git)
@@ -148,6 +153,16 @@ tests/         test automatici
 ```
 
 Per mettere il tuo logo nei PDF salva un file `config\logo.png`.
+
+## Marchio
+
+L'app si chiama **Pronta**. Il simbolo è una porta aperta con una spunta: l'appartamento pronto per il prossimo ospite.
+
+- **Colori**: inchiostro `#171717`, carta `#FAFAFA`, pietra `#E8E4DC`, accento terracotta `#C2562B` (solo nel logo e nel materiale di marca, mai per gli stati dell'app).
+- **Carattere**: Geist, con Geist Mono per i codici.
+- **Tono**: "tu" con te e con le addette, "Lei" con i proprietari; niente emoji o punti esclamativi nei messaggi.
+- **Rendiconti**: i PDF ai proprietari portano il tuo logo e il tuo colore; Pronta compare solo in piccolo nel piè di pagina ("generato con Pronta").
+- **File** in `public/brand`: `pronta-logo.svg` (e versione bianca), `pronta-simbolo.svg`, `pronta-icona.svg`, `pronta-whatsapp-640.png` da usare come foto profilo del numero WhatsApp Business, `pronta-anteprima-social.png` per l'anteprima del repository su GitHub (Settings → Social preview).
 
 ## 9. Limiti noti e prossimi passi
 

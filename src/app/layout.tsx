@@ -1,17 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import { House } from "lucide-react";
 import Link from "next/link";
 import "./globals.css";
 import { getDb, dbMode } from "@/db/client";
 import { getTenant } from "@/services/common";
 import { env } from "@/lib/env";
 import { AppNav } from "@/components/app-nav";
+import { ProntaMark } from "@/components/brand";
 
 export const metadata: Metadata = {
-  title: "Back-office affitti",
-  description: "Pulizie e rendiconti per affitti brevi",
+  title: { default: "Pronta", template: "%s · Pronta" },
+  description: "Pulizie via WhatsApp e rendiconti mensili per gli affitti brevi.",
+  applicationName: "Pronta",
 };
 
 export const viewport: Viewport = {
@@ -49,12 +50,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
           <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-3 px-4 md:px-6">
-            <Link href="/" className="flex min-w-0 items-center gap-2.5 rounded-md" aria-label={`${name}, vai a Oggi`}>
-              <span className="grid size-7 shrink-0 place-items-center rounded-md bg-ink text-white">
-                <House className="size-4" strokeWidth={2} aria-hidden />
+            <Link href="/" className="flex shrink-0 items-center gap-1.5 rounded-md" aria-label="Pronta, vai a Oggi">
+              <ProntaMark className="size-6 shrink-0" />
+              <span className="hidden text-[17px] leading-none font-semibold tracking-[-0.045em] text-ink sm:inline">
+                pronta
               </span>
-              <span className="truncate text-sm font-semibold tracking-tight text-ink">{name}</span>
             </Link>
+            <svg viewBox="0 0 16 24" className="h-6 w-4 shrink-0 text-line-strong" aria-hidden focusable="false">
+              <path d="M11 3 5 21" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" fill="none" />
+            </svg>
+            <span className="min-w-0 truncate text-sm font-medium text-ink" title={name}>
+              {name}
+            </span>
 
             {systemNote ? (
               <span

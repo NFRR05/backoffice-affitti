@@ -2,7 +2,7 @@
   "name": "backoffice-affitti",
   "version": "0.1.0",
   "private": true,
-  "description": "Back-office per affitti brevi: pulizie via WhatsApp e rendiconti ai proprietari (versione 1, uso interno)",
+  "description": "Pronta: pulizie via WhatsApp e rendiconti mensili ai proprietari per gli affitti brevi (versione 1, uso interno)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

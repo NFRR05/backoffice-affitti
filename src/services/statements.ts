@@ -204,7 +204,7 @@ export async function sendStatement(db: DB, statementId: string): Promise<{ simu
     `Importo spettante: ${total}.`,
     st.correctsId && st.correctionNote ? `\nQuesta è una rettifica del rendiconto inviato in precedenza: ${st.correctionNote}` : "",
     "",
-    "Per qualsiasi domanda rispondi pure a questa email.",
+    "Per qualsiasi domanda può rispondere direttamente a questa email.",
     "",
     tenant.managerName,
     tenant.name,

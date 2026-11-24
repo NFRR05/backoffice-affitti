@@ -172,7 +172,8 @@ function StatementDocument({ tenant, apartment, ownerNames, statement, correctio
 
         <Text style={styles.footer} fixed>
           {tenant.name} · Rendiconto {apartment.code} {statement.period}
-          {statement.version > 1 ? ` v${statement.version}` : ""} · generato il {formatDate(new Date().toISOString().slice(0, 10))}
+          {statement.version > 1 ? ` v${statement.version}` : ""} · generato con Pronta il{" "}
+          {formatDate(new Date().toISOString().slice(0, 10))}
         </Text>
       </Page>
     </Document>

@@ -28,7 +28,7 @@ export async function fetchCalendar(url: string): Promise<string> {
     return fs.readFile(path.resolve(/*turbopackIgnore: true*/ process.cwd(), relative), "utf8");
   }
   const response = await fetch(url, {
-    headers: { "User-Agent": "backoffice-affitti/0.1 (+sincronizzazione calendario)" },
+    headers: { "User-Agent": "Pronta/0.1 (+sincronizzazione calendario)" },
     signal: AbortSignal.timeout(20_000),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);

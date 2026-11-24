@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Pronta"><title>Pronta</title>
+  <rect width="48" height="48" rx="11" fill="#171717"/>
+  <g transform="translate(24 24.5) scale(0.66) translate(-24 -24.5)"><path d="M20 8h19v33H20" fill="none" stroke="#FFFFFF" stroke-width="4.4" stroke-linejoin="miter"/>
+  <path d="M20 6.2 9 10.5v27L20 42.8z" fill="#FFFFFF"/>
+  <path d="M24.5 25.5l4 4 7-8" fill="none" stroke="#E0794A" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>
