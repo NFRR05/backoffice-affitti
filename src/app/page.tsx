@@ -13,7 +13,8 @@ import {
   Metric,
   PageHeader,
   Section,
-  cleaningStatusClass,
+  cleaningStatusDot,
+  CLEANING_STATUS_ORDER,
   cleaningStatusLabel,
   dayLabel,
   param,
@@ -123,7 +124,10 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
   const hiddenNoGuests = Math.max(0, noGuests.length - 6);
 
   const upcomingByDay = new Map<string, typeof active>();
-  for (const u of active.slice(0, 14)) upcomingByDay.set(u.job.date, [...(upcomingByDay.get(u.job.date) ?? []), u]);
+  // Le prime 8: la colonna resta alta quanto "Da sistemare"; il resto è nella pagina Pulizie.
+  const UPCOMING_SHOWN = 8;
+  for (const u of active.slice(0, UPCOMING_SHOWN)) upcomingByDay.set(u.job.date, [...(upcomingByDay.get(u.job.date) ?? []), u]);
+  const upcomingHidden = Math.max(0, active.length - UPCOMING_SHOWN);
 
   // Calendario del mese: settimane da lunedì.
   const lead = (weekday(first) + 6) % 7;
@@ -172,7 +176,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
         />
       </div>
 
-      <div className="mb-8 grid gap-6 lg:grid-cols-5">
+      <div className="mb-8 grid items-start gap-6 lg:grid-cols-5">
         <Section
           title="Da sistemare"
           description={attention.length === 0 ? "Tutto in ordine." : `${plural(attention.length + hiddenNoGuests, "voce", "voci")}, le più urgenti in alto.`}
@@ -184,8 +188,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
             {attention.map((a) => (
               <li key={a.key} className="flex items-center justify-between gap-4 px-5 py-3.5">
                 <div className="min-w-0">
-                  <div className="text-[15px] font-medium text-ink">{a.title}</div>
-                  <div className={`mt-0.5 text-sm ${a.urgent ? "text-bad" : "text-muted"}`}>{a.detail}</div>
+                  <div className="text-sm font-medium text-ink">{a.title}</div>
+                  <div className={`mt-0.5 flex items-center gap-2 text-[13px] ${a.urgent ? "text-bad" : "text-muted"}`}>
+                    {a.urgent ? <span className="dot bg-bad" aria-hidden /> : null}
+                    {a.detail}
+                  </div>
                 </div>
                 <Link className="btn btn-sm shrink-0" href={a.href}>
                   {a.action}
@@ -216,7 +223,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
           <div className="pb-2">
             {[...upcomingByDay.entries()].map(([date, items]) => (
               <div key={date} className="pt-4">
-                <h3 className="px-5 pb-1 text-[13px] font-semibold text-ink-soft">{dayLabel(date, today)}</h3>
+                <h3 className="px-5 pb-1 text-[12px] font-medium text-muted">{dayLabel(date, today)}</h3>
                 <ul>
                   {items.map(({ job, aptName, cleanerName }) => (
                     <li key={job.id} className="flex items-start justify-between gap-3 px-5 py-2">
@@ -236,6 +243,13 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
               </div>
             ))}
           </div>
+          {upcomingHidden > 0 ? (
+            <div className="border-t border-line px-5 py-3.5 text-sm">
+              <Link className="link" href="/pulizie">
+                Altre {plural(upcomingHidden, "pulizia", "pulizie")} nei prossimi 7 giorni
+              </Link>
+            </div>
+          ) : null}
         </Section>
       </div>
 
@@ -265,19 +279,28 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
           </div>
           <div className="grid grid-cols-7 gap-px overflow-hidden rounded-lg border border-line bg-line">
             {days.map((d, i) => (
-              <div key={i} className={`min-h-24 p-2 ${!d ? "bg-paper/60" : d === today ? "bg-paper" : "bg-surface"}`}>
+              <div key={i} className={`min-h-24 p-1.5 ${!d ? "bg-paper" : "bg-surface"}`}>
                 {d ? (
                   <>
-                    <div className={`mb-1 text-[13px] tabular-nums ${d === today ? "font-semibold text-ink" : "text-muted"}`}>
-                      {Number(d.slice(8))}
+                    <div className="mb-1 px-1">
+                      <span
+                        className={`inline-grid min-w-5 place-items-center rounded-full text-[12px] tabular-nums ${
+                          d === today ? "bg-ink px-1.5 font-semibold text-white" : "text-muted"
+                        }`}
+                      >
+                        {Number(d.slice(8))}
+                      </span>
                     </div>
                     {(byDate.get(d) ?? []).map(({ job, aptCode, aptName, cleanerName }) => (
                       <Link
                         key={job.id}
                         href={`/pulizie?dal=${d}&al=${d}`}
                         title={`${aptName}, ${cleanerName ?? "senza addetta"}: ${cleaningStatusLabel(job.status).toLowerCase()}`}
-                        className={`block truncate text-[12px] leading-5 font-medium hover:underline ${cleaningStatusClass(job.status)}`}
+                        className={`flex items-center gap-1.5 truncate rounded px-1 font-mono text-[11.5px] leading-5 hover:bg-hover ${
+                          job.status === "annullato" ? "text-faint line-through" : "text-ink-soft"
+                        }`}
                       >
+                        <span className={`dot size-1.5 ${cleaningStatusDot(job.status)}`} aria-hidden />
                         {aptCode}
                       </Link>
                     ))}
@@ -298,7 +321,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
                   <li key={job.id}>
                     <Link href={`/pulizie?dal=${d}&al=${d}`} className="flex items-center justify-between gap-3 py-1.5">
                       <span className="truncate text-sm text-ink">{aptName}</span>
-                      <span className={`shrink-0 text-[13px] font-medium ${cleaningStatusClass(job.status)}`}>{cleaningStatusLabel(job.status)}</span>
+                      <span className="shrink-0">
+                        <CleaningStatusText status={job.status} small />
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -307,10 +332,13 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
           ))}
         </div>
 
-        <p className="mt-4 text-[13px] text-muted">
-          Il colore indica lo stato: <span className="text-warn">in attesa di risposta</span>, <span className="text-bad">da riassegnare</span>,{" "}
-          <span className="text-ok">fatta</span>.
-        </p>
+        <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2" aria-label="Legenda">
+          {CLEANING_STATUS_ORDER.map((st) => (
+            <li key={st}>
+              <CleaningStatusText status={st} small />
+            </li>
+          ))}
+        </ul>
       </Section>
     </div>
   );

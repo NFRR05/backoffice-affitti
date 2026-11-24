@@ -60,7 +60,7 @@ export default async function MessaggiPage({ searchParams }: { searchParams: Sea
               const ref = m.body.match(/"(\d{4}) \d+"/)?.[1] ?? "";
               return (
                 <li key={m.id} className={`flex ${incoming ? "justify-start" : "justify-end"}`}>
-                  <article className={`w-full max-w-xl rounded-xl px-4 py-3.5 ${incoming ? "border border-line bg-surface" : "bg-ok-soft"}`}>
+                  <article className={`w-full max-w-xl rounded-lg px-4 py-3.5 ${incoming ? "border border-line bg-surface" : "bg-ok-soft"}`}>
                     <header className="flex flex-wrap items-baseline justify-between gap-x-4">
                       <h3 className="text-sm font-medium text-ink">
                         {incoming ? "Da" : "A"} {m.contactName ?? `+${m.phone}`}

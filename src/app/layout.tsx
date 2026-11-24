@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource-variable/instrument-sans";
-import "@fontsource/instrument-serif";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import { House } from "lucide-react";
+import Link from "next/link";
 import "./globals.css";
 import { getDb, dbMode } from "@/db/client";
 import { getTenant } from "@/services/common";
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f6f5f1",
+  themeColor: "#ffffff",
 };
 
 export const dynamic = "force-dynamic";
@@ -25,51 +27,60 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const tenant = await getTenant(db);
   const name = tenant?.name ?? "Affitti brevi";
 
-  // Una sola frase sullo stato dei servizi, e solo quando qualcosa è simulato.
+  // Una sola nota sullo stato dei servizi, e solo quando qualcosa è simulato.
   const fakeWhatsapp = !env.whatsapp.enabled;
   const fakeEmail = !env.smtp.enabled;
   const systemNote =
     fakeWhatsapp && fakeEmail
-      ? "Modalità prova: WhatsApp ed email sono simulati, nessun messaggio parte davvero."
+      ? "WhatsApp ed email sono simulati: nessun messaggio parte davvero."
       : fakeWhatsapp
-        ? "Modalità prova: WhatsApp è simulato, nessun messaggio parte davvero."
+        ? "WhatsApp è simulato: nessun messaggio parte davvero."
         : fakeEmail
-          ? "Modalità prova: l'email è simulata, i rendiconti non partono davvero."
+          ? "L'email è simulata: i rendiconti non partono davvero."
           : null;
+  const storage = dbMode() === "locale" ? "Dati salvati su questo computer." : "Dati su PostgreSQL.";
 
   return (
-    <html lang="it">
+    <html lang="it" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="min-h-dvh">
         <a href="#contenuto" className="skip-link">
           Vai al contenuto
         </a>
 
-        <div className="md:flex md:min-h-dvh">
-          <header className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur md:hidden">
-            <div className="px-4 pt-4 pb-2">
-              <div className="truncate font-serif text-xl leading-tight text-ink">{name}</div>
-            </div>
-            <AppNav variant="top" />
-          </header>
+        <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
+          <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-3 px-4 md:px-6">
+            <Link href="/" className="flex min-w-0 items-center gap-2.5 rounded-md" aria-label={`${name}, vai a Oggi`}>
+              <span className="grid size-7 shrink-0 place-items-center rounded-md bg-ink text-white">
+                <House className="size-4" strokeWidth={2} aria-hidden />
+              </span>
+              <span className="truncate text-sm font-semibold tracking-tight text-ink">{name}</span>
+            </Link>
 
-          <aside className="hidden md:sticky md:top-0 md:flex md:h-dvh md:w-60 md:shrink-0 md:flex-col md:border-r md:border-line">
-            <div className="px-6 pt-7 pb-6">
-              <div className="font-serif text-[1.375rem] leading-tight text-ink">{name}</div>
-              <div className="mt-1 text-[13px] text-muted">Pulizie e rendiconti</div>
-            </div>
+            {systemNote ? (
+              <span
+                title={`${systemNote} ${storage}`}
+                className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-[12px] font-medium text-ink-soft"
+              >
+                <span className="dot bg-warn" aria-hidden />
+                Modalità prova
+              </span>
+            ) : (
+              <span className="ml-auto hidden text-[12px] text-muted sm:inline">{storage}</span>
+            )}
+          </div>
+          <div className="mx-auto w-full max-w-6xl px-2 md:px-4">
+            <AppNav />
+          </div>
+        </header>
 
-            <AppNav variant="side" />
+        <main id="contenuto" className="mx-auto w-full max-w-6xl px-4 pt-8 pb-16 md:px-6 md:pt-10">
+          {children}
+        </main>
 
-            <div className="mt-auto space-y-2 px-6 py-6 text-[12px] leading-5 text-muted">
-              {systemNote ? <p>{systemNote}</p> : null}
-              <p>{dbMode() === "locale" ? "Dati salvati su questo computer." : "Dati su PostgreSQL."}</p>
-            </div>
-          </aside>
-
-          <main id="contenuto" className="min-w-0 flex-1 px-4 pt-6 pb-16 md:px-10 md:pt-10">
-            <div className="mx-auto w-full max-w-6xl">{children}</div>
-          </main>
-        </div>
+        <footer className="mx-auto w-full max-w-6xl px-4 pb-8 text-[12px] text-faint md:px-6">
+          {systemNote ? `${systemNote} ` : ""}
+          {storage}
+        </footer>
       </body>
     </html>
   );

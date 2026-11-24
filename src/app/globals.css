@@ -2,35 +2,41 @@
 
 /*
   Sistema visivo
-  - Serif (Instrument Serif) solo per titoli di pagina e numeri chiave.
-  - Sans (Instrument Sans) per tutto il resto, con cifre tabulari negli importi.
-  - Colori: carta, superfici bianche, inchiostro. Verde, arancio e rosso solo per gli stati.
+  - Geist Sans per il testo, Geist Mono per codici e riferimenti (font open source, licenza OFL).
+  - Bianco e nero: pagina grigio chiarissimo, superfici bianche, bordi sottili, testo quasi nero.
+  - Il colore serve solo agli stati: pallino + etichetta (grigio, ambra, blu, verde, rosso).
 */
 @theme {
-  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  /* Nessun serif: eventuali residui usano lo stesso sans. */
+  --font-serif: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 
-  --color-paper: #f6f5f1;
+  --color-paper: #fafafa;
   --color-surface: #ffffff;
-  --color-hover: #efede7;
-  --color-line: #e5e2da;
-  --color-line-strong: #cfcac0;
+  --color-hover: #f2f2f2;
+  --color-line: #ebebeb;
+  --color-line-strong: #d9d9d9;
 
-  --color-ink: #1b1a17;
-  --color-ink-soft: #3d3b36;
-  --color-muted: #6b675f;
-  --color-faint: #9b978e;
+  --color-ink: #171717;
+  --color-ink-soft: #404040;
+  --color-muted: #666666;
+  --color-faint: #a1a1a1;
 
   /* Barre dei soggiorni nel calendario di occupazione */
-  --color-stay: #ece9e1;
-  --color-stay-hover: #e2ded4;
+  --color-stay: #f0f0f0;
+  --color-stay-hover: #e6e6e6;
 
-  --color-ok: #2e6b4f;
-  --color-ok-soft: #e9f2ec;
-  --color-warn: #8f5a0b;
-  --color-warn-soft: #fbf2e1;
-  --color-bad: #b4261a;
-  --color-bad-soft: #fcecea;
+  --color-ok: #107d32;
+  --color-ok-soft: #eefbf1;
+  --color-warn: #a35200;
+  --color-warn-soft: #fff7e8;
+  --color-bad: #d22f2f;
+  --color-bad-soft: #fff0f0;
+  --color-info: #0a68d4;
+  --color-info-soft: #eef5ff;
+
+  --radius-card: 0.5rem;
 }
 
 html {
@@ -40,6 +46,7 @@ html {
 
 body {
   @apply bg-paper font-sans text-ink antialiased;
+  font-feature-settings: "ss01" on;
 }
 
 @layer base {
@@ -55,29 +62,34 @@ body {
   summary::-webkit-details-marker {
     display: none;
   }
+
+  ::selection {
+    background: #171717;
+    color: #ffffff;
+  }
 }
 
 /* Componenti in un layer dedicato: le classi di utilità (w-24, h-9, …) li possono correggere caso per caso. */
 @layer components {
   .skip-link {
-    @apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2 focus:text-sm focus:font-medium;
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-surface focus:px-3 focus:py-2 focus:text-sm focus:font-medium;
   }
 
-  /* Bottoni: 40px di altezza su telefono, 36px su desktop. Hover solo come cambio di colore. */
+  /* Bottoni: 40px su telefono, 32px su desktop. */
   .btn {
-    @apply inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-line-strong bg-surface px-4 text-sm font-medium whitespace-nowrap text-ink transition-colors duration-150 hover:bg-hover disabled:pointer-events-none disabled:opacity-50 md:h-9 md:px-3.5;
+    @apply inline-flex h-10 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-line-strong bg-surface px-3.5 text-sm font-medium whitespace-nowrap text-ink shadow-[0_1px_1px_rgba(0,0,0,0.03)] transition-colors duration-150 hover:bg-hover disabled:pointer-events-none disabled:opacity-50 md:h-8 md:px-3;
   }
 
   .btn-primary {
-    @apply border-ink bg-ink text-white hover:border-ink-soft hover:bg-ink-soft;
+    @apply border-ink bg-ink text-white hover:border-[#383838] hover:bg-[#383838];
   }
 
   .btn-danger {
-    @apply border-bad/40 text-bad hover:bg-bad-soft;
+    @apply border-bad/30 text-bad hover:bg-bad-soft;
   }
 
   .btn-sm {
-    @apply h-9 px-3 text-[13px] md:h-8;
+    @apply h-9 px-2.5 text-[13px] md:h-7;
   }
 
   .link {
@@ -85,15 +97,15 @@ body {
   }
 
   .input {
-    @apply h-10 rounded-lg border border-line-strong bg-surface px-3 text-base text-ink transition-colors placeholder:text-faint focus:border-ink focus:ring-2 focus:ring-ink/10 focus:outline-none disabled:bg-paper md:h-9 md:text-sm;
+    @apply h-10 rounded-md border border-line-strong bg-surface px-3 text-base text-ink transition-[border-color,box-shadow] placeholder:text-faint hover:border-[#c2c2c2] focus:border-ink-soft focus:ring-[3px] focus:ring-black/[0.07] focus:outline-none disabled:bg-paper md:h-8 md:px-2.5 md:text-sm;
   }
 
   .label {
-    @apply text-[13px] font-medium text-ink-soft;
+    @apply text-[13px] font-medium text-muted;
   }
 
   .card {
-    @apply rounded-xl border border-line bg-surface;
+    @apply rounded-[var(--radius-card)] border border-line bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.03)];
   }
 
   .table {
@@ -101,11 +113,11 @@ body {
   }
 
   .table th {
-    @apply border-b border-line px-3 py-2.5 text-[13px] font-medium text-muted;
+    @apply border-b border-line bg-paper px-3 py-2 text-[12px] font-medium text-muted;
   }
 
   .table td {
-    @apply border-b border-line/70 px-3 py-2.5 align-top;
+    @apply border-b border-line px-3 py-2.5 align-top;
   }
 
   .table tr:last-child td {
@@ -118,5 +130,10 @@ body {
 
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Pallino di stato, come nelle liste di build e deploy. */
+  .dot {
+    @apply inline-block size-2 shrink-0 rounded-full;
   }
 }

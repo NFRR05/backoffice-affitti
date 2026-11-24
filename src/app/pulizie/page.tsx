@@ -141,7 +141,7 @@ export default async function PuliziePage({ searchParams }: { searchParams: Sear
                     <div className="min-w-0">
                       <div className="text-[15px] font-medium text-ink">
                         {apt.name}
-                        <span className="ml-2 text-[13px] font-normal text-muted">{apt.code}</span>
+                        <span className="ml-2 rounded border border-line bg-paper px-1.5 py-px font-mono text-[11px] font-normal text-muted">{apt.code}</span>
                       </div>
                       <div className="mt-1 text-sm text-ink-soft tabular-nums">{windowLabel(job)}</div>
                       {job.sameDay ? (

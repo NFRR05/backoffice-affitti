@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     <div className="max-w-xl py-6">
-      <h1 className="font-serif text-[2.125rem] leading-[1.1] text-ink md:text-[2.5rem]">Qualcosa non ha funzionato</h1>
+      <h1 className="text-2xl font-semibold tracking-[-0.03em] text-ink md:text-[2rem]">Qualcosa non ha funzionato</h1>
       <p className="mt-3 text-[15px] leading-6 break-words text-bad">{error.message}</p>
       <p className="mt-3 text-[15px] leading-6 text-muted">
         Riprova. Se il problema continua, dalle Impostazioni puoi caricare la demo o reimportare la configurazione.

@@ -8,13 +8,13 @@ import { addDays, formatShort } from "@/lib/dates";
 /* Struttura della pagina                                              */
 /* ------------------------------------------------------------------ */
 
-/** Titolo della pagina (serif), una riga di descrizione, azioni a destra. */
+/** Titolo della pagina, una riga di descrizione, azioni a destra. */
 export function PageHeader({ title, description, actions }: { title: string; description?: ReactNode; actions?: ReactNode }) {
   return (
-    <header className="mb-8 flex flex-col gap-4 md:mb-10 md:flex-row md:items-end md:justify-between">
+    <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div className="min-w-0">
-        <h1 className="font-serif text-[2.125rem] leading-[1.1] text-ink md:text-[2.5rem]">{title}</h1>
-        {description ? <div className="mt-2 max-w-2xl text-[15px] leading-6 text-muted">{description}</div> : null}
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-ink md:text-[2rem] md:leading-10">{title}</h1>
+        {description ? <div className="mt-1.5 max-w-2xl text-sm leading-6 text-muted">{description}</div> : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
     </header>
@@ -42,10 +42,10 @@ export function Section({
   return (
     <section id={id} className={`card ${className}`}>
       {title ? (
-        <div className="flex flex-col gap-3 border-b border-line px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-line px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <h2 className="text-base font-semibold text-ink">{title}</h2>
-            {description ? <p className="mt-0.5 text-sm text-muted">{description}</p> : null}
+            <h2 className="text-[15px] font-semibold tracking-tight text-ink">{title}</h2>
+            {description ? <p className="mt-0.5 text-[13px] text-muted">{description}</p> : null}
           </div>
           {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
         </div>
@@ -72,17 +72,17 @@ export function Metric({
   const color = tone === "bad" ? "text-bad" : tone === "warn" ? "text-warn" : "text-ink";
   const body = (
     <>
-      <div className="text-[13px] font-medium text-muted">{label}</div>
-      <div className={`mt-2 font-serif text-[1.75rem] leading-none break-words sm:text-[2.25rem] ${color}`}>{value}</div>
+      <div className="text-[13px] text-muted">{label}</div>
+      <div className={`mt-2 text-[1.75rem] leading-none font-semibold tracking-[-0.04em] tabular-nums break-words ${color}`}>{value}</div>
       {hint ? <div className="mt-2 text-[13px] text-muted">{hint}</div> : null}
     </>
   );
   return href ? (
-    <Link href={href} className="card block min-w-0 p-5 transition-colors hover:border-line-strong">
+    <Link href={href} className="card block min-w-0 p-4 transition-colors hover:border-line-strong hover:bg-[#fcfcfc] md:p-5">
       {body}
     </Link>
   ) : (
-    <div className="card min-w-0 p-5">{body}</div>
+    <div className="card min-w-0 p-4 md:p-5">{body}</div>
   );
 }
 
@@ -99,14 +99,14 @@ export function Field({ label, children, className = "" }: { label: string; chil
 /** Scelte rapide (periodi, filtri) come controllo a segmenti. */
 export function Segmented({ label, items }: { label: string; items: { label: string; href: string; active: boolean }[] }) {
   return (
-    <nav aria-label={label} className="scrollbar-none inline-flex max-w-full overflow-x-auto rounded-lg border border-line-strong bg-surface p-0.5">
+    <nav aria-label={label} className="scrollbar-none inline-flex max-w-full overflow-x-auto rounded-md border border-line bg-paper p-0.5">
       {items.map((item) => (
         <Link
           key={item.href}
           href={item.href}
           aria-current={item.active ? "true" : undefined}
-          className={`inline-flex h-9 shrink-0 items-center rounded-md px-3 text-[13px] font-medium whitespace-nowrap transition-colors md:h-8 ${
-            item.active ? "bg-ink text-white" : "text-ink-soft hover:bg-hover hover:text-ink"
+          className={`inline-flex h-9 shrink-0 items-center rounded-[5px] px-3 text-[13px] font-medium whitespace-nowrap transition-colors md:h-7 ${
+            item.active ? "bg-surface text-ink shadow-[0_0_0_1px_var(--color-line),0_1px_2px_rgba(0,0,0,0.06)]" : "text-muted hover:text-ink"
           }`}
         >
           {item.label}
@@ -132,7 +132,9 @@ export function Flash({ ok, errore }: { ok?: string; errore?: string }) {
   return (
     <div
       role={isError ? "alert" : "status"}
-      className={`mb-6 flex items-start gap-3 rounded-lg px-4 py-3 text-sm ${isError ? "bg-bad-soft text-bad" : "bg-ok-soft text-ok"}`}
+      className={`mb-6 flex items-start gap-3 rounded-md border px-4 py-3 text-sm ${
+        isError ? "border-bad/20 bg-bad-soft text-bad" : "border-ok/20 bg-ok-soft text-ok"
+      }`}
     >
       <Icon className="mt-0.5 size-4 shrink-0" aria-hidden />
       <p className="font-medium">{errore ?? ok}</p>
@@ -141,16 +143,18 @@ export function Flash({ ok, errore }: { ok?: string; errore?: string }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Stati: solo testo colorato                                          */
+/* Stati: pallino colorato + etichetta                                 */
 /* ------------------------------------------------------------------ */
 
-const CLEANING_STATUS: Record<CleaningStatus, { label: string; className: string }> = {
-  creato: { label: "Da inviare", className: "text-ink-soft" },
-  inviato: { label: "In attesa di risposta", className: "text-warn" },
-  confermato: { label: "Confermata", className: "text-ink" },
-  completato: { label: "Fatta", className: "text-ok" },
-  escalation: { label: "Da riassegnare", className: "text-bad" },
-  annullato: { label: "Annullata", className: "text-faint line-through" },
+type StatusStyle = { label: string; dot: string; text: string };
+
+const CLEANING_STATUS: Record<CleaningStatus, StatusStyle> = {
+  creato: { label: "Da inviare", dot: "bg-faint", text: "text-ink-soft" },
+  inviato: { label: "In attesa di risposta", dot: "bg-warn", text: "text-warn" },
+  confermato: { label: "Confermata", dot: "bg-info", text: "text-ink" },
+  completato: { label: "Fatta", dot: "bg-ok", text: "text-ok" },
+  escalation: { label: "Da riassegnare", dot: "bg-bad", text: "text-bad" },
+  annullato: { label: "Annullata", dot: "border border-faint bg-transparent", text: "text-faint line-through" },
 };
 
 export const CLEANING_STATUS_ORDER: CleaningStatus[] = ["creato", "inviato", "confermato", "escalation", "completato", "annullato"];
@@ -159,36 +163,48 @@ export function cleaningStatusLabel(status: CleaningStatus): string {
   return CLEANING_STATUS[status].label;
 }
 
+/** Colore del testo per lo stato (calendari e liste compatte). */
 export function cleaningStatusClass(status: CleaningStatus): string {
-  return CLEANING_STATUS[status].className;
+  return CLEANING_STATUS[status].text;
+}
+
+/** Classe del pallino per lo stato. */
+export function cleaningStatusDot(status: CleaningStatus): string {
+  return CLEANING_STATUS[status].dot;
+}
+
+function StatusLabel({ style, small }: { style: StatusStyle; small?: boolean }) {
+  return (
+    <span className={`inline-flex items-center gap-2 ${small ? "text-[13px]" : "text-sm"} font-medium text-ink-soft`}>
+      <span className={`dot ${style.dot}`} aria-hidden />
+      <span className={style.text === "text-ink" || style.text === "text-ink-soft" ? "" : style.text}>{style.label}</span>
+    </span>
+  );
 }
 
 export function CleaningStatusText({ status, small }: { status: CleaningStatus; small?: boolean }) {
-  const s = CLEANING_STATUS[status];
-  return <span className={`${small ? "text-[13px]" : "text-sm"} font-medium ${s.className}`}>{s.label}</span>;
+  return <StatusLabel style={CLEANING_STATUS[status]} small={small} />;
 }
 
 const RESERVATION_STATUS = {
-  confermata: { label: "Confermata", className: "text-ink" },
-  conclusa: { label: "Conclusa", className: "text-muted" },
-  cancellata: { label: "Cancellata", className: "text-faint line-through" },
-  da_verificare: { label: "Da verificare", className: "text-warn" },
-} as const;
+  confermata: { label: "Confermata", dot: "bg-ok", text: "text-ink" },
+  conclusa: { label: "Conclusa", dot: "bg-faint", text: "text-muted" },
+  cancellata: { label: "Cancellata", dot: "border border-faint bg-transparent", text: "text-faint line-through" },
+  da_verificare: { label: "Da verificare", dot: "bg-warn", text: "text-warn" },
+} as const satisfies Record<string, StatusStyle>;
 
 export function ReservationStatusText({ status, small }: { status: keyof typeof RESERVATION_STATUS; small?: boolean }) {
-  const s = RESERVATION_STATUS[status];
-  return <span className={`${small ? "text-[13px]" : "text-sm"} font-medium ${s.className}`}>{s.label}</span>;
+  return <StatusLabel style={RESERVATION_STATUS[status]} small={small} />;
 }
 
 const STATEMENT_STATUS = {
-  bozza: { label: "Bozza", className: "text-warn" },
-  verificato: { label: "Verificato", className: "text-ink" },
-  inviato: { label: "Inviato", className: "text-ok" },
-} as const;
+  bozza: { label: "Bozza", dot: "bg-warn", text: "text-ink" },
+  verificato: { label: "Verificato", dot: "bg-info", text: "text-ink" },
+  inviato: { label: "Inviato", dot: "bg-ok", text: "text-ink" },
+} as const satisfies Record<string, StatusStyle>;
 
 export function StatementStatusText({ status, small }: { status: keyof typeof STATEMENT_STATUS; small?: boolean }) {
-  const s = STATEMENT_STATUS[status];
-  return <span className={`${small ? "text-[13px]" : "text-sm"} font-medium ${s.className}`}>{s.label}</span>;
+  return <StatusLabel style={STATEMENT_STATUS[status]} small={small} />;
 }
 
 const STATEMENT_STEPS = [
@@ -209,12 +225,12 @@ export function StatementSteps({ status }: { status: "bozza" | "verificato" | "i
           <li
             key={step.key}
             aria-current={active ? "step" : undefined}
-            className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${
-              active ? "border-ink bg-surface" : "border-line bg-transparent"
+            className={`flex items-center gap-3 rounded-md border px-4 py-3 ${
+              active ? "border-ink bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.05)]" : "border-line bg-transparent"
             }`}
           >
             <span
-              className={`grid size-7 shrink-0 place-items-center rounded-full text-[13px] font-semibold ${
+              className={`grid size-6 shrink-0 place-items-center rounded-full text-[12px] font-semibold tabular-nums ${
                 active ? "bg-ink text-white" : done ? "bg-ok-soft text-ok" : "bg-hover text-faint"
               }`}
             >

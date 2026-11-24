@@ -157,7 +157,7 @@ export default async function PrenotazioniPage({ searchParams }: { searchParams:
               <div className="grid gap-3 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,1fr)_minmax(0,0.8fr)] md:items-start md:gap-6">
                 <div className="min-w-0">
                   <div className="text-[15px] font-medium text-ink">{apt.name}</div>
-                  <div className="text-[13px] text-muted">Codice {r.ref}</div>
+                  <div className="text-[13px] text-muted">Codice <span className="font-mono text-[12px] text-ink-soft">{r.ref}</span></div>
                 </div>
 
                 <div>
@@ -172,7 +172,7 @@ export default async function PrenotazioniPage({ searchParams }: { searchParams:
 
                 <div className="min-w-0 text-sm text-ink">
                   {CHANNEL[r.channel] ?? r.channel}
-                  {r.externalCode ? <div className="truncate text-[13px] text-muted">{r.externalCode}</div> : null}
+                  {r.externalCode ? <div className="truncate font-mono text-[12px] text-muted">{r.externalCode}</div> : null}
                 </div>
 
                 <div>
