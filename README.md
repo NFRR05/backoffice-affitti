@@ -147,6 +147,7 @@ src/
                e API (/api/cron/tick, /api/whatsapp/webhook)
 public/brand/  logo, icona e immagini del marchio Pronta
 config/        configurazione.example.json, logo.png facoltativo per i PDF
+docs/          piano di sviluppo
 drizzle/       migrazioni SQL
 data/          database locale, calendari demo, PDF archiviati (escluso da Git)
 tests/         test automatici
@@ -165,6 +166,8 @@ L'app si chiama **Pronta**. Il simbolo è una porta aperta con una spunta: l'app
 - **File** in `public/brand`: `pronta-logo.svg` (e versione bianca), `pronta-simbolo.svg`, `pronta-icona.svg`, `pronta-whatsapp-640.png` da usare come foto profilo del numero WhatsApp Business, `pronta-anteprima-social.png` per l'anteprima del repository su GitHub (Settings → Social preview).
 
 ## 9. Limiti noti e prossimi passi
+
+Il piano per la versione da vendere ad altri gestori (channel manager con Channex, comunicazioni tra tutti i soggetti, adempimenti italiani, costi e fasi) è in [docs/piano-sviluppo.md](docs/piano-sviluppo.md).
 
 - Import CSV dei pagamenti Airbnb/Booking (serve un file reale di esempio).
 - Alla prima importazione dei calendari reali controlla che nessuna prenotazione compaia due volte: le date che Airbnb importa da Booking vengono già scartate, ma il comportamento dell'esportazione di Booking va verificato sui tuoi annunci.
